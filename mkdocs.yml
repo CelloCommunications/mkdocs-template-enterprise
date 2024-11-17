@@ -1,0 +1,104 @@
+# Project information
+site_name: Mkdocs Material Example
+site_description: Just a tester
+
+# Repository
+repo_name: shaneholloman/mkdocs-material-example
+repo_url: https://github.com/shaneholloman/mkdocs-material-example
+edit_uri: blob/main/docs/
+
+# Copyright
+copyright: Copyright &copy; shaneholloman
+
+# nav:
+#   - Welcome: index.md
+#   - User Guide:
+#       - guide/index.md
+#       - Installation: guide/installation.md
+#       - Basics: guide/basics.md
+#       - Configuration: guide/config.md
+#   - Changelog: changelog.md
+
+theme:
+  name: material
+  features:
+    - content.tooltips
+    - content.action.edit
+    - content.action.meta
+    - content.action.view
+    - header.autohide
+    - navigation.instant
+    - navigation.tracking
+    - content.code.annotate
+    - toc.integrate
+    - toc.follow
+    - navigation.path
+    - navigation.top
+    - navigation.tabs
+    - navigation.footer
+    - content.code.copy
+    - content.footnote.tooltips
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: indigo
+      accent: indigo
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - attr_list
+  - md_in_html
+  - admonition
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.blocks.caption
+  - pymdownx.superfences
+      # custom_fences:
+      #   - name: mermaid
+      #     class: mermaid
+      #     format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+  - tags
+  # - meta
+
+
+extra_css:
+  - static/extra.css
