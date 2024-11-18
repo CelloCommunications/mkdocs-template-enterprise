@@ -1,6 +1,6 @@
 # MkDocs Template
 
-[![ci](https://github.com/shaneholloman/mkdocs-material-example/actions/workflows/ci.yml/badge.svg)](https://github.com/shaneholloman/mkdocs-material-example/actions/workflows/ci.yml)
+
 
 [[toc]]
 
@@ -12,7 +12,7 @@ View doc output here:
 https://<username>.github.io/<repository-name>
 ```
 
-<https://shaneholloman.github.io/mkdocs-material-example/>
+<https://shaneholloman.github.io/mkdocs-template-enterprise/>
 
 ## Private Pages Configuration
 
