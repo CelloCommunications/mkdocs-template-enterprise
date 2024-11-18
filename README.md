@@ -1,7 +1,5 @@
 # MkDocs Template
 
-
-
 [[toc]]
 
 ## Default Deployment Location
@@ -12,7 +10,7 @@ View doc output here:
 https://<username>.github.io/<repository-name>
 ```
 
-<https://shaneholloman.github.io/mkdocs-template-enterprise/>
+<https://cellocommunications.github.io/mkdocs-template-enterprise/>
 
 ## Private Pages Configuration
 
