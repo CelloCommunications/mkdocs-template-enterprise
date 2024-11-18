@@ -1,4 +1,4 @@
-# Welcome to MkDocs Test!!@
+# Welcome to MkDocs Test
 
 Repo is here [mkdocs-template-enterprise](https://github.com/CelloCommunications/mkdocs-template-enterprise).
 
@@ -11,6 +11,8 @@ Repo is here [mkdocs-template-enterprise](https://github.com/CelloCommunications
 * yadda yadda yadda
 
 Image test:
+
+![GVLIUhUW4AAJHD-](https://github.com/user-attachments/assets/8bb21993-a551-4d2d-8dab-a77d493b47da)
 
 ## Project layout
 
