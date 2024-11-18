@@ -1,5 +1,24 @@
 {
   "yaml.schemas": {
     "https://json.schemastore.org/mkdocs-1.6.json": "file:///c%3A/Users/shane/git/mkdocs-material-example/mkdocs.yml"
-  }
+  },
+  "cSpell.words": [
+    "adipiscing",
+    "amet",
+    "auctor",
+    "consectetur",
+    "consequat",
+    "Curabitur",
+    "cursus",
+    "elit",
+    "euismod",
+    "feugiat",
+    "finibus",
+    "justo",
+    "nulla",
+    "Nulla",
+    "Phasellus",
+    "posuere",
+    "tortor"
+  ]
 }
