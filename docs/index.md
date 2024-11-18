@@ -1,6 +1,6 @@
 # Welcome to MkDocs Test
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Repo is here [mkdocs-template-enterprise](https://github.com/CelloCommunications/mkdocs-template-enterprise).
 
 ## Commands
 
