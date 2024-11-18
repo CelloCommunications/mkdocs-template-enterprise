@@ -2,7 +2,7 @@
 
 This document outlines how to configure dual deployment of the MkDocs site to both GitHub Pages and a datacenter server.
 
-Uses a straight forward approach to deploy the MkDocs site to a datacenter server using either SCP or Rsync rather than faphing around with Docker containers, github runners or other complex solutions.
+Uses a straight forward approach to deploy the MkDocs site to our datacenter server using either SCP or Rsync rather than faphing around with Docker containers, github runners or other complex solutions.
 
 yet to be tested ...
 
