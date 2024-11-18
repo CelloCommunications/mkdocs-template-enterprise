@@ -3,12 +3,12 @@ site_name: Mkdocs Material Example
 site_description: Just a tester
 
 # Repository
-repo_name: shaneholloman/mkdocs-material-example
+repo_name: cellocommunications/mkdocs-material-example
 repo_url: https://github.com/CelloCommunications/mkdocs-template-enterprise
 edit_uri: blob/main/docs/
 
 # Copyright
-copyright: Copyright &copy; shaneholloman
+copyright: Copyright &copy; cellocommunications
 
 # nav:
 #   - Welcome: index.md
@@ -51,7 +51,7 @@ theme:
       accent: indigo
 
     # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
+    - media: '(prefers-color-scheme: dark)'
       scheme: slate
       primary: black
       accent: indigo
@@ -76,10 +76,10 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.blocks.caption
   - pymdownx.superfences
-      # custom_fences:
-      #   - name: mermaid
-      #     class: mermaid
-      #     format: !!python/name:pymdownx.superfences.fence_code_format
+    # custom_fences:
+    #   - name: mermaid
+    #     class: mermaid
+    #     format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -98,7 +98,6 @@ plugins:
   - search
   - tags
   # - meta
-
 
 extra_css:
   - static/extra.css

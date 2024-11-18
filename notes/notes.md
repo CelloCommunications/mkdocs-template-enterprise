@@ -87,7 +87,7 @@ Once thats enabled, we can create a token for the repo here:
    * Generate token and copy it
 
 2. **Add Secret to Repository**
-   * Go to repository Settings <https://github.com/shaneholloman/mkdocs-material-example/settings/secrets/actions>
+   * Go to repository Settings <https://github.com/cellocommunications/mkdocs-material-example/settings/secrets/actions>
    * Navigate to Security → Secrets and variables → Actions
    * Click "New repository secret"
    * Name: `GH_TOKEN`
