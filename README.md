@@ -1,5 +1,7 @@
 # MkDocs Template
 
+[![ci](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml)
+
 [[toc]]
 
 ## Default Deployment Location
