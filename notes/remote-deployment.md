@@ -1,6 +1,6 @@
 # Remote Deployment Configuration
 
-Idea to configure dual deployment of the MkDocs site to both GitHub Pages and a datacenter server.
+Idea to configure dual deployment of the MkDocs site to both GitHub Pages one of our datacenters.
 
 Uses a straight forward approach to deploy the MkDocs site to our datacenter server using either SCP or Rsync rather than faphing around with Docker containers, github runners or other complex solutions.
 
