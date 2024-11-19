@@ -8,7 +8,7 @@ repo_url: https://github.com/CelloCommunications/mkdocs-template-enterprise
 edit_uri: blob/main/docs/
 
 # Copyright
-copyright: Copyright &copy; cellocommunications
+copyright: Copyright &copy; Cello Ltd
 
 # nav:
 #   - Welcome: index.md
@@ -97,7 +97,7 @@ markdown_extensions:
 plugins:
   - search
   - tags
-  # - meta
+  # - meta # Insiders only
 
 extra_css:
   - static/extra.css
