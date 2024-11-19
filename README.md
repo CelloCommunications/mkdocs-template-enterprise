@@ -5,7 +5,7 @@
 > [!IMPORTANT]
 > Pleased note this repository is a template for creating a new repository.
 > It is not intended to be used directly. Please dont dump random content here as it will be overwritten.
-> While working on our KB refactor this template is used for work in progress by Shane Holloman
+> While working on our KB refactor this template is used for work in progress and testing.
 
 [[toc]]
 
