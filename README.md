@@ -2,6 +2,11 @@
 
 [![ci](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml)
 
+> [!IMPORTANT]
+> Pleased note this repository is a template for creating a new repository.
+> It is not intended to be used directly. Please dont dump random content here as it will be overwritten.
+> While working on our KB refactor this template is used for work in progress by Shane Holloman
+
 [[toc]]
 
 ## Default Deployment Location
