@@ -7,6 +7,9 @@
 > It is not intended to be used directly. Please dont dump random content here as it will be overwritten.
 > While working on our KB refactor this template is used for work in progress and testing.
 
+> [!CAUTION]
+> Also this repo must be public just for now so be careful what is added to it!
+
 [[toc]]
 
 ## Default Deployment Location
