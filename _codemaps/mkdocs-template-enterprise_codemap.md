@@ -1,6 +1,6 @@
 # mkdocs-template-enterprise
 
-> CodeMap Source: Local directory: `C:\Users\shane\Dropbox\cello\git\mkdocs-template-enterprise`
+> CodeMap Source: Local directory: `/home/shadmin/cello/git/mkdocs-template-enterprise`
 
 This markdown document provides a comprehensive overview of the directory structure and file contents. It aims to give viewers (human or AI) a complete view of the codebase in a single file for easy analysis.
 
@@ -14,25 +14,28 @@ The table of contents below is for navigational convenience and reflects this do
   - [Document Table of Contents](#document-table-of-contents)
   - [Repo File Tree](#repo-file-tree)
   - [Repo File Contents](#repo-file-contents)
-    - [.gitignore](#gitignore)
     - [kickstart.ps1](#kickstartps1)
+    - [README.md](#readmemd)
     - [kickstart.sh](#kickstartsh)
     - [mkdocs.yml](#mkdocsyml)
-    - [README.md](#readmemd)
+    - [gitignore](#gitignore)
     - [requirements.txt](#requirementstxt)
-    - [.github/copilot-instructions.md](#githubcopilot-instructionsmd)
-    - [.github/workflows/ci.yml](#githubworkflowsciyml)
-    - [.vscode/settings.json](#vscodesettingsjson)
+    - [vscode/settings.json](#vscodesettingsjson)
+    - [github/CODEOWNERS](#githubcodeowners)
+    - [github/copilot-instructions.md](#githubcopilot-instructionsmd)
+    - [github/workflows/ci.yml](#githubworkflowsciyml)
     - [docs/changelog.md](#docschangelogmd)
     - [docs/index.md](#docsindexmd)
     - [docs/guide/annotations.md](#docsguideannotationsmd)
-    - [docs/guide/config.md](#docsguideconfigmd)
-    - [docs/guide/grid.md](#docsguidegridmd)
     - [docs/guide/installation.md](#docsguideinstallationmd)
+    - [docs/guide/grid.md](#docsguidegridmd)
+    - [docs/guide/config.md](#docsguideconfigmd)
+    - [notes/fortigate-notes.md](#notesfortigate-notesmd)
+    - [notes/workflows.md](#notesworkflowsmd)
     - [notes/notes.md](#notesnotesmd)
     - [notes/privacy.md](#notesprivacymd)
+    - [notes/remote-deployment.md](#notesremote-deploymentmd)
     - [notes/token-access-enable.png](#notestoken-access-enablepng)
-    - [notes/workflows.md](#notesworkflowsmd)
 
 <!-- /TOC -->
 
@@ -47,9 +50,11 @@ This file tree represents the actual structure of the repository. It's crucial f
 │   │   ├── ci-for-non-insiders.zip
 │   │   ├── ci.yml
 │   │   └── ci.zip
+│   ├── CODEOWNERS
 │   └── copilot-instructions.md
 ├── .vscode/
 │   └── settings.json
+├── _codemaps/
 ├── docs/
 │   ├── guide/
 │   │   ├── annotations.md
@@ -60,8 +65,10 @@ This file tree represents the actual structure of the repository. It's crucial f
 │   ├── changelog.md
 │   └── index.md
 ├── notes/
+│   ├── fortigate-notes.md
 │   ├── notes.md
 │   ├── privacy.md
+│   ├── remote-deployment.md
 │   ├── token-access-enable.png
 │   └── workflows.md
 ├── .gitignore
@@ -71,12 +78,349 @@ This file tree represents the actual structure of the repository. It's crucial f
 ├── mkdocs.yml
 └── requirements.txt
 
-6 directories, 22 files
+7 directories, 25 files
 ```
 
 ## Repo File Contents
 
 The following sections present the content of each file in the repository. Large and binary files are acknowledged but their contents are not displayed.
+
+### kickstart.ps1
+
+```powershell
+# Check for gh CLI installation
+if (gh --version 2>&1) {
+  Write-Host "GitHub CLI is installed" -ForegroundColor Green
+} else {
+  Write-Host "GitHub CLI is not installed" -ForegroundColor Yellow
+  Write-Host "To install GitHub CLI, visit: https://github.com/cli/cli#installation"
+  exit 1
+}
+
+# Define the GitHub account or organization name
+$githubAccount = "CelloCommunications" # Change this to your personal account name if needed
+
+# Initialize a new git repository
+git init -b main
+
+# Get the name of the current repository from the top-level directory
+$repoName = Split-Path -Leaf (git rev-parse --show-toplevel)
+
+# Create a new repository on GitHub using the gh CLI
+gh repo create $githubAccount/$repoName --private --confirm
+
+# Add the remote repository
+git remote add origin "https://github.com/$githubAccount/$repoName.git"
+
+# Add all files in the current directory to the git repository
+git add .
+
+# Commit the changes
+git commit -m "Initial commit"
+
+# Push the changes to GitHub
+git push -u origin main
+
+# Define a hashtable where the key is the name of the secret and the value is the secret value
+$secrets = @{
+  "DOCKERHUB_TOKEN"    = $env:DOCKERHUB_TOKEN
+  "DOCKERHUB_USERNAME" = $env:DOCKERHUB_USERNAME
+  "GALAXY_API_KEY"     = $env:GALAXY_API_KEY
+  # Add more secrets here as needed
+}
+
+# Check if environment variables exist
+$missingVars = @()
+foreach ($key in $secrets.Keys) {
+  if ([string]::IsNullOrEmpty($secrets[$key])) {
+    $missingVars += $key
+  }
+}
+
+if ($missingVars.Count -ne 0) {
+  # Print 2 blank lines here to make the output easier to read
+  Write-Host "`n`nThe following environment variables are missing, but you dont have to use them:"
+  foreach ($var in $missingVars) {
+    Write-Host $var
+  }
+  Write-Host "You may add them to your $profile file or set them in the current session"
+  exit 1
+}
+
+# Loop through each secret to set it for the current repository
+foreach ($key in $secrets.Keys) {
+  $value = $secrets[$key]
+  $command = "echo -n $value | gh secret set $key --repo=$githubAccount/$repoName"
+  Invoke-Expression $command
+}
+
+# Tag and push after setting the secrets
+$commitMessage = "tagging initial version"
+$tagVersion = "0.0.1"
+$tagMessage = "Initial version"
+
+git commit --allow-empty -m $commitMessage
+git tag -a $tagVersion -m $tagMessage
+
+# Ask the user if the current git tag and message are correct
+# Print 2 blank lines here to make the output easier to read
+Write-Host "`n`nThe current git tag is $tagVersion with the message '$tagMessage'. Is this correct? (yes/no)"
+$answer = Read-Host
+
+if ($answer -match "^[Yy]") {
+  git push origin $tagVersion
+} else {
+  Write-Host "Please edit the git tag and message in this script."
+}
+```
+
+### README.md
+
+````markdown
+# MkDocs Template
+
+[![ci](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml)
+
+> [!IMPORTANT]
+> Pleased note this repository is a template for creating a new repository.
+> It is not intended to be used directly. Please dont dump random content here as it will be overwritten.
+> While working on our KB refactor this template is used for work in progress and testing.
+
+[[toc]]
+
+## Default Deployment Location
+
+View doc output here:
+
+```txt
+https://<username>.github.io/<repository-name>
+```
+
+<https://cellocommunications.github.io/mkdocs-template-enterprise/>
+
+## Private Pages Configuration
+
+Configure GitHub Pages for private access, restricting it to organization members only.
+
+[privacy](notes/privacy.md)
+
+## Workflow Concepts
+
+Workflow concepts for managing documentation with GitHub Pages with more advanced features.
+
+[workflows](notes/workflows.md)
+
+## CoPilot Instructions
+
+Your Copilot preferences are set via concise plain language instructions here.
+
+[copilot](.github/copilot-instructions.md)
+````
+
+### kickstart.sh
+
+```bash
+#!/bin/bash
+
+# Define color codes
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check for gh CLI installation
+if command -v gh &>/dev/null; then
+  echo -e "${GREEN}GitHub CLI is installed${NC}"
+else
+  echo -e "${YELLOW}GitHub CLI is not installed${NC}"
+  echo "To install GitHub CLI, visit: https://github.com/cli/cli#installation"
+  exit 1
+fi
+
+# Define the GitHub account or organization name
+githubAccount="CelloCommunications" # Change this to your personal account name if needed
+
+# Initialize a new git repository
+git init -b main
+
+# Get the name of the current repository from the top-level directory
+repoName=$(basename "$(git rev-parse --show-toplevel)")
+
+# Create a new repository on GitHub using the gh CLI
+gh repo create "$githubAccount/$repoName" --private --confirm
+
+# Add the remote repository
+git remote add origin "https://github.com/$githubAccount/$repoName.git"
+
+# Add all files in the current directory to the git repository
+git add .
+
+# Commit the changes
+git commit -m "Initial commit"
+
+# Push the changes to GitHub
+git push -u origin main
+
+# Define an associative array where the key is the name of the secret and the value is the secret value
+declare -A secrets
+secrets=(
+  ["DOCKERHUB_TOKEN"]="$DOCKERHUB_TOKEN"
+  ["DOCKERHUB_USERNAME"]="$DOCKERHUB_USERNAME"
+  ["GALAXY_API_KEY"]="$GALAXY_API_KEY"
+  # Add more secrets here as needed
+)
+
+# Check if environment variables exist
+missingVars=()
+for key in "${!secrets[@]}"; do
+  if [ -z "${secrets[$key]}" ]; then
+    missingVars+=("$key")
+  fi
+done
+
+if [ ${#missingVars[@]} -ne 0 ]; then
+  # Print 2 blank lines here to make the output easier to read
+  echo -e "\n\nThe following environment variables are missing, but you dont have to use them:"
+  for var in "${missingVars[@]}"; do
+    echo "$var"
+  done
+  echo "You may add them to your .bashrc file or set them in the current session"
+  exit 1
+fi
+
+# Loop through each secret to set it for the current repository
+for key in "${!secrets[@]}"; do
+  value=${secrets[$key]}
+  command="echo -n $value | gh secret set $key --repo=$githubAccount/$repoName"
+  eval "$command"
+done
+
+# Tag and push after setting the secrets
+commitMessage="tagging initial version"
+tagVersion="0.0.1"
+tagMessage="Initial version"
+
+git commit --allow-empty -m "$commitMessage"
+git tag -a $tagVersion -m "$tagMessage"
+
+# Ask the user if the current git tag and message are correct
+# Print 2 blank lines here to make the output easier to read
+echo -e "\n\nThe current git tag is $tagVersion with the message '$tagMessage'. Is this correct? (yes/no)"
+read -r answer
+
+if [ "$answer" != "${answer#[Yy]}" ]; then
+  git push origin $tagVersion
+else
+  echo "Please edit the git tag and message in this script."
+fi
+```
+
+### mkdocs.yml
+
+```yml
+# Project information
+site_name: Mkdocs Material Example
+site_description: Just a tester
+
+# Repository
+repo_name: cellocommunications/mkdocs-material-example
+repo_url: https://github.com/CelloCommunications/mkdocs-template-enterprise
+edit_uri: blob/main/docs/
+
+# Copyright
+copyright: Copyright &copy; Cello Group Ltd
+
+# nav:
+#   - Welcome: index.md
+#   - User Guide:
+#       - guide/index.md
+#       - Installation: guide/installation.md
+#       - Basics: guide/basics.md
+#       - Configuration: guide/config.md
+#   - Changelog: changelog.md
+
+theme:
+  name: material
+  features:
+    - content.tooltips
+    - content.action.edit
+    - content.action.meta
+    - content.action.view
+    - header.autohide
+    - navigation.instant
+    - navigation.tracking
+    - content.code.annotate
+    - toc.integrate
+    - toc.follow
+    - navigation.path
+    - navigation.top
+    - navigation.tabs
+    - navigation.footer
+    - content.code.copy
+    - content.footnote.tooltips
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: indigo
+      accent: indigo
+
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - attr_list
+  - md_in_html
+  - admonition
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.blocks.caption
+  - pymdownx.superfences
+    # custom_fences:
+    #   - name: mermaid
+    #     class: mermaid
+    #     format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+  - tags
+  # - meta # Insiders only
+
+extra_css:
+  - static/extra.css
+```
 
 ### .gitignore
 
@@ -243,342 +587,57 @@ cython_debug/
 #.idea/
 ```
 
-### kickstart.ps1
-
-```powershell
-# Check for gh CLI installation
-if (gh --version 2>&1) {
-  Write-Host "GitHub CLI is installed" -ForegroundColor Green
-} else {
-  Write-Host "GitHub CLI is not installed" -ForegroundColor Yellow
-  Write-Host "To install GitHub CLI, visit: https://github.com/cli/cli#installation"
-  exit 1
-}
-
-# Define the GitHub account or organization name
-$githubAccount = "CelloCommunications" # Change this to your personal account name if needed
-
-# Initialize a new git repository
-git init -b main
-
-# Get the name of the current repository from the top-level directory
-$repoName = Split-Path -Leaf (git rev-parse --show-toplevel)
-
-# Create a new repository on GitHub using the gh CLI
-gh repo create $githubAccount/$repoName --private --confirm
-
-# Add the remote repository
-git remote add origin "https://github.com/$githubAccount/$repoName.git"
-
-# Add all files in the current directory to the git repository
-git add .
-
-# Commit the changes
-git commit -m "Initial commit"
-
-# Push the changes to GitHub
-git push -u origin main
-
-# Define a hashtable where the key is the name of the secret and the value is the secret value
-$secrets = @{
-  "DOCKERHUB_TOKEN"    = $env:DOCKERHUB_TOKEN
-  "DOCKERHUB_USERNAME" = $env:DOCKERHUB_USERNAME
-  "GALAXY_API_KEY"     = $env:GALAXY_API_KEY
-  # Add more secrets here as needed
-}
-
-# Check if environment variables exist
-$missingVars = @()
-foreach ($key in $secrets.Keys) {
-  if ([string]::IsNullOrEmpty($secrets[$key])) {
-    $missingVars += $key
-  }
-}
-
-if ($missingVars.Count -ne 0) {
-  # Print 2 blank lines here to make the output easier to read
-  Write-Host "`n`nThe following environment variables are missing, but you dont have to use them:"
-  foreach ($var in $missingVars) {
-    Write-Host $var
-  }
-  Write-Host "You may add them to your $profile file or set them in the current session"
-  exit 1
-}
-
-# Loop through each secret to set it for the current repository
-foreach ($key in $secrets.Keys) {
-  $value = $secrets[$key]
-  $command = "echo -n $value | gh secret set $key --repo=$githubAccount/$repoName"
-  Invoke-Expression $command
-}
-
-# Tag and push after setting the secrets
-$commitMessage = "tagging initial version"
-$tagVersion = "0.0.1"
-$tagMessage = "Initial version"
-
-git commit --allow-empty -m $commitMessage
-git tag -a $tagVersion -m $tagMessage
-
-# Ask the user if the current git tag and message are correct
-# Print 2 blank lines here to make the output easier to read
-Write-Host "`n`nThe current git tag is $tagVersion with the message '$tagMessage'. Is this correct? (yes/no)"
-$answer = Read-Host
-
-if ($answer -match "^[Yy]") {
-  git push origin $tagVersion
-} else {
-  Write-Host "Please edit the git tag and message in this script."
-}
-```
-
-### kickstart.sh
-
-```bash
-#!/bin/bash
-
-# Define color codes
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Check for gh CLI installation
-if command -v gh &>/dev/null; then
-  echo -e "${GREEN}GitHub CLI is installed${NC}"
-else
-  echo -e "${YELLOW}GitHub CLI is not installed${NC}"
-  echo "To install GitHub CLI, visit: https://github.com/cli/cli#installation"
-  exit 1
-fi
-
-# Define the GitHub account or organization name
-githubAccount="CelloCommunications" # Change this to your personal account name if needed
-
-# Initialize a new git repository
-git init -b main
-
-# Get the name of the current repository from the top-level directory
-repoName=$(basename "$(git rev-parse --show-toplevel)")
-
-# Create a new repository on GitHub using the gh CLI
-gh repo create "$githubAccount/$repoName" --private --confirm
-
-# Add the remote repository
-git remote add origin "https://github.com/$githubAccount/$repoName.git"
-
-# Add all files in the current directory to the git repository
-git add .
-
-# Commit the changes
-git commit -m "Initial commit"
-
-# Push the changes to GitHub
-git push -u origin main
-
-# Define an associative array where the key is the name of the secret and the value is the secret value
-declare -A secrets
-secrets=(
-  ["DOCKERHUB_TOKEN"]="$DOCKERHUB_TOKEN"
-  ["DOCKERHUB_USERNAME"]="$DOCKERHUB_USERNAME"
-  ["GALAXY_API_KEY"]="$GALAXY_API_KEY"
-  # Add more secrets here as needed
-)
-
-# Check if environment variables exist
-missingVars=()
-for key in "${!secrets[@]}"; do
-  if [ -z "${secrets[$key]}" ]; then
-    missingVars+=("$key")
-  fi
-done
-
-if [ ${#missingVars[@]} -ne 0 ]; then
-  # Print 2 blank lines here to make the output easier to read
-  echo -e "\n\nThe following environment variables are missing, but you dont have to use them:"
-  for var in "${missingVars[@]}"; do
-    echo "$var"
-  done
-  echo "You may add them to your .bashrc file or set them in the current session"
-  exit 1
-fi
-
-# Loop through each secret to set it for the current repository
-for key in "${!secrets[@]}"; do
-  value=${secrets[$key]}
-  command="echo -n $value | gh secret set $key --repo=$githubAccount/$repoName"
-  eval "$command"
-done
-
-# Tag and push after setting the secrets
-commitMessage="tagging initial version"
-tagVersion="0.0.1"
-tagMessage="Initial version"
-
-git commit --allow-empty -m "$commitMessage"
-git tag -a $tagVersion -m "$tagMessage"
-
-# Ask the user if the current git tag and message are correct
-# Print 2 blank lines here to make the output easier to read
-echo -e "\n\nThe current git tag is $tagVersion with the message '$tagMessage'. Is this correct? (yes/no)"
-read -r answer
-
-if [ "$answer" != "${answer#[Yy]}" ]; then
-  git push origin $tagVersion
-else
-  echo "Please edit the git tag and message in this script."
-fi
-```
-
-### mkdocs.yml
-
-```yml
-# Project information
-site_name: Mkdocs Material Example
-site_description: Just a tester
-
-# Repository
-repo_name: cellocommunications/mkdocs-material-example
-repo_url: https://github.com/CelloCommunications/mkdocs-template-enterprise
-edit_uri: blob/main/docs/
-
-# Copyright
-copyright: Copyright &copy; cellocommunications
-
-# nav:
-#   - Welcome: index.md
-#   - User Guide:
-#       - guide/index.md
-#       - Installation: guide/installation.md
-#       - Basics: guide/basics.md
-#       - Configuration: guide/config.md
-#   - Changelog: changelog.md
-
-theme:
-  name: material
-  features:
-    - content.tooltips
-    - content.action.edit
-    - content.action.meta
-    - content.action.view
-    - header.autohide
-    - navigation.instant
-    - navigation.tracking
-    - content.code.annotate
-    - toc.integrate
-    - toc.follow
-    - navigation.path
-    - navigation.top
-    - navigation.tabs
-    - navigation.footer
-    - content.code.copy
-    - content.footnote.tooltips
-  icon:
-    repo: fontawesome/brands/github
-  palette:
-    # Palette toggle for light mode
-    - media: '(prefers-color-scheme: light)'
-      scheme: default
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-      primary: indigo
-      accent: indigo
-
-    # Palette toggle for dark mode
-    - media: '(prefers-color-scheme: dark)'
-      scheme: slate
-      primary: black
-      accent: indigo
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-
-markdown_extensions:
-  - abbr
-  - attr_list
-  - md_in_html
-  - admonition
-  - def_list
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.critic
-  - pymdownx.caret
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.tilde
-  - pymdownx.details
-  - pymdownx.keys
-  - pymdownx.blocks.caption
-  - pymdownx.superfences
-    # custom_fences:
-    #   - name: mermaid
-    #     class: mermaid
-    #     format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.tabbed:
-      alternate_style: true
-  - tables
-  - footnotes
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-
-plugins:
-  - search
-  - tags
-  # - meta
-
-extra_css:
-  - static/extra.css
-```
-
-### README.md
-
-````markdown
-# MkDocs Template
-
-[![ci](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml)
-
-[[toc]]
-
-## Default Deployment Location
-
-View doc output here:
-
-```txt
-https://<username>.github.io/<repository-name>
-```
-
-<https://cellocommunications.github.io/mkdocs-template-enterprise/>
-
-## Private Pages Configuration
-
-Configure GitHub Pages for private access, restricting it to organization members only.
-
-[privacy](notes/privacy.md)
-
-## Workflow Concepts
-
-Workflow concepts for managing documentation with GitHub Pages with more advanced features.
-
-[workflows](notes/workflows.md)
-
-## CoPilot Instructions
-
-Your Copilot preferences are set via concise plain language instructions here.
-
-[copilot](.github/copilot-instructions.md)
-````
-
 ### requirements.txt
 
 ```ini
 mkdocs-material
+```
+
+### .vscode/settings.json
+
+```json
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/mkdocs-1.6.json": "file:///c%3A/Users/shane/git/mkdocs-material-example/mkdocs.yml"
+  },
+  "cSpell.words": [
+    "adipiscing",
+    "amet",
+    "auctor",
+    "consectetur",
+    "consequat",
+    "Curabitur",
+    "cursus",
+    "elit",
+    "euismod",
+    "feugiat",
+    "finibus",
+    "justo",
+    "nulla",
+    "Nulla",
+    "Phasellus",
+    "posuere",
+    "tortor"
+  ]
+}
+```
+
+### .github/CODEOWNERS
+
+```txt
+# Default owner for everything in the repo
+
+* @shaneholloman
+
+# Documentation and Markdown files
+
+*.md @shaneholloman
+/docs/ @shaneholloman
+/notes/ @shaneholloman
+
+# GitHub specific files
+
+/.github/ @shaneholloman
 ```
 
 ### .github/copilot-instructions.md
@@ -668,35 +727,6 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages # Match the upload name
-```
-
-### .vscode/settings.json
-
-```json
-{
-  "yaml.schemas": {
-    "https://json.schemastore.org/mkdocs-1.6.json": "file:///c%3A/Users/shane/git/mkdocs-material-example/mkdocs.yml"
-  },
-  "cSpell.words": [
-    "adipiscing",
-    "amet",
-    "auctor",
-    "consectetur",
-    "consequat",
-    "Curabitur",
-    "cursus",
-    "elit",
-    "euismod",
-    "feugiat",
-    "finibus",
-    "justo",
-    "nulla",
-    "Nulla",
-    "Phasellus",
-    "posuere",
-    "tortor"
-  ]
-}
 ```
 
 ### docs/changelog.md
@@ -1229,12 +1259,10 @@ After applying the customization, you can use the custom admonition type:
 </div>
 ````
 
-### docs/guide/config.md
+### docs/guide/installation.md
 
 ````markdown
-# Config
-
-None to speak of yet ...
+# Installation
 ````
 
 ### docs/guide/grid.md
@@ -1540,9 +1568,6 @@ by using a `div` with the `grid` class:
   </div>
 </div>
 
-  [admonitions]: #
-  [code blocks]: #
-  [content tabs]: #
 ````
 
 ### docs/guide/index.md
@@ -1553,10 +1578,295 @@ by using a `div` with the `grid` class:
 This is the get started tutorial.
 ````
 
-### docs/guide/installation.md
+### docs/guide/config.md
 
 ````markdown
-# Installation
+# Config
+
+None to speak of yet ...
+````
+
+### notes/fortigate-notes.md
+
+````markdown
+# Fortigate Notes
+
+## GitHub Actions IP Ranges
+
+Main curl: `curl https://api.github.com/meta`
+
+Get the IP ranges for GitHub Actions via Linux
+
+```bash
+#!/bin/bash
+
+echo "# GitHub Actions IP Ranges (Major blocks only):"
+curl -s https://api.github.com/meta | \
+jq -r '.actions[]' | \
+grep -v ':' | \
+grep -E '^[0-9]+\.[0-9]+\.0\.0/(16|15|14|13|12)' | \
+sort -t. -k1,1n -k2,2n | \
+uniq
+
+echo -e "\n# Number of major blocks found:"
+curl -s https://api.github.com/meta | \
+jq -r '.actions[]' | \
+grep -v ':' | \
+grep -E '^[0-9]+\.[0-9]+\.0\.0/(16|15|14|13|12)' | \
+wc -l
+```
+
+```txt
+ base 3.12.4  shadmin @ devops ❯ ~ ❯ ./github-actions-ip-extractor.sh
+# GitHub Actions IP Ranges (Major blocks only):
+4.148.0.0/16
+4.151.0.0/16
+4.152.0.0/15
+4.154.0.0/15
+4.156.0.0/15
+4.175.0.0/16
+4.180.0.0/16
+4.207.0.0/16
+4.208.0.0/15
+9.163.0.0/16
+13.64.0.0/16
+13.65.0.0/16
+13.74.0.0/16
+13.79.0.0/16
+13.80.0.0/15
+13.82.0.0/16
+13.83.0.0/16
+13.84.0.0/15
+13.89.0.0/16
+13.90.0.0/16
+13.91.0.0/16
+13.92.0.0/16
+13.95.0.0/16
+20.3.0.0/16
+20.4.0.0/16
+20.7.0.0/16
+20.8.0.0/16
+20.10.0.0/16
+20.16.0.0/16
+20.22.0.0/16
+20.23.0.0/16
+20.31.0.0/16
+20.56.0.0/16
+20.61.0.0/16
+20.71.0.0/16
+20.73.0.0/16
+20.76.0.0/16
+20.86.0.0/16
+20.96.0.0/16
+20.101.0.0/16
+20.103.0.0/16
+20.110.0.0/16
+20.121.0.0/16
+20.122.0.0/16
+20.124.0.0/16
+20.126.0.0/16
+20.127.0.0/16
+20.160.0.0/16
+20.161.0.0/16
+20.166.0.0/16
+20.171.0.0/16
+20.185.0.0/16
+20.223.0.0/16
+20.224.0.0/16
+20.225.0.0/16
+20.229.0.0/16
+20.232.0.0/16
+20.245.0.0/16
+40.68.0.0/16
+40.71.0.0/16
+40.76.0.0/16
+40.88.0.0/16
+40.116.0.0/16
+40.121.0.0/16
+40.124.0.0/16
+48.217.0.0/16
+50.85.0.0/16
+51.124.0.0/16
+51.136.0.0/16
+51.144.0.0/16
+52.160.0.0/16
+52.162.0.0/16
+52.164.0.0/16
+52.166.0.0/16
+52.167.0.0/16
+52.168.0.0/16
+52.169.0.0/16
+52.170.0.0/16
+52.171.0.0/16
+52.173.0.0/16
+52.174.0.0/16
+52.177.0.0/16
+52.186.0.0/16
+52.188.0.0/16
+52.224.0.0/16
+52.226.0.0/16
+52.241.0.0/16
+57.153.0.0/16
+74.235.0.0/16
+98.64.0.0/16
+104.42.0.0/16
+108.141.0.0/16
+108.142.0.0/15
+172.168.0.0/15
+172.170.0.0/16
+172.174.0.0/16
+172.175.0.0/16
+172.176.0.0/15
+172.179.0.0/16
+172.180.0.0/15
+172.182.0.0/16
+172.183.0.0/16
+172.184.0.0/15
+172.190.0.0/15
+172.200.0.0/16
+172.201.0.0/16
+172.211.0.0/16
+
+# Number of major blocks found:
+107
+```
+
+Get the IP ranges for GitHub Actions via Fortigate
+
+```txt
+# If you want to generate Fortigate config directly:
+echo "config firewall address"
+curl -s https://api.github.com/meta | jq -r '.actions[]' | awk '{
+    printf("    edit \"GitHub-Actions-Range-%d\"\n        set type iprange\n        set comment \"GitHub Actions Runner IP range\"\n        set subnet %s\n    next\n", NR, $1)
+}'
+echo "end"
+```
+````
+
+### notes/workflows.md
+
+````markdown
+# Workflows Approach
+
+My justification for using the `actions/deploy-pages` action over the `mkdocs gh-deploy` approach [shown here](https://github.com/squidfunk/mkdocs-material/blob/master/docs/publishing-your-site.md)
+
+## Overview
+
+1. **mkdocs gh-deploy approach**:
+
+- Pros:
+  - Simpler workflow (fewer steps)
+  - Built-in to MkDocs
+- Cons:
+  - Requires git credentials setup
+  - Less control over deployment process
+
+- Doesn't use GitHub's native Pages deployment
+
+1. **Our current approach**:
+
+- Pros:
+  - Uses official GitHub Pages actions
+  - Better artifact handling
+  - More explicit control
+  - Integrates with GitHub's deployment system
+  - No git credentials needed
+  - Better security model
+  - Supports Preview Deployments
+
+1. **Conclusion:**
+
+Our current workflow using `actions/deploy-pages` is actually superior because:
+
+- It's more maintainable
+- Better integrated with GitHub
+- More secure
+- More features
+- More transparent
+
+Recommendation: Keep our current workflow - it's the better approach than the official docs suggest.
+
+To expand on the key differences with some added detail:
+
+### 1. Artifact Handling
+
+- **Our Approach**:
+
+  ```yaml
+  - uses: actions/upload-pages-artifact@v3
+  - uses: actions/deploy-pages@v4
+  ```
+
+  - Separate build and deploy steps
+  - Artifacts are properly versioned
+  - Can be downloaded for debugging
+  - Supports retention policies
+
+- **gh-deploy**:
+  - Single command deployment
+  - No artifact preservation
+  - Harder to debug failed deployments
+
+### 2. Security Model
+
+- **Our Approach**:
+
+  ```yaml
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+  ```
+
+  - Granular permissions
+  - OIDC token authentication
+  - Minimal required access
+
+- **gh-deploy**:
+  - Requires repository write access
+  - Uses less secure PAT tokens
+  - Broader permissions scope
+
+### 3. Preview Deployments
+
+- **Our Approach**:
+
+  ```yaml
+  environment:
+    name: github-pages
+    url: ${{ steps.deployment.outputs.page_url }}
+  ```
+
+  - Supports PR preview deployments
+  - Environment protection rules
+  - Deployment URLs in PR comments
+
+### 4. Integration Features
+
+- **Our Approach**:
+  - Deployment status checks
+  - GitHub deployment API integration
+  - Deployment history
+  - Status badges
+  - Branch protection rules support
+
+### 5. Cache Management
+
+- **Our Approach**:
+
+  ```yaml
+  - name: Generate cache key
+    id: cache-key
+    run: |
+      echo "week=$(date --utc '+%V')" >> $GITHUB_OUTPUT
+      echo "hash=$(sha256sum mkdocs.yml | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
+  ```
+
+  - Content-aware caching
+  - Weekly rotation
+  - Configuration-based invalidation
+
+Our current approach is more robust and enterprise-ready.
 ````
 
 ### notes/notes.md
@@ -1730,136 +2040,187 @@ To verify the setup:
 - External embeds might not work due to authentication requirements
 ````
 
+### notes/remote-deployment.md
+
+````markdown
+# Remote Deployment Configuration
+
+Idea to configure dual deployment of the MkDocs site to both GitHub Pages one of our datacenters.
+
+Uses a straight forward approach to deploy the MkDocs site to our datacenter server using either SCP or Rsync rather than faphing around with Docker containers, github runners or other complex solutions.
+
+> [!WARNING]
+> yet to be tested ...
+
+[[toc]]
+
+## Overview
+
+The setup enables:
+
+- Building the documentation once
+- Deploying to GitHub Pages (existing functionality)
+- Deploying to a datacenter server (new functionality)
+
+## Implementation Steps
+
+### 1. Required Secrets
+
+Add these secrets to your GitHub repository (Settings > Secrets and variables > Actions):
+
+```yaml
+DC_HOST: "your.datacenter.com"
+DC_USERNAME: "deployment-user"
+DC_SSH_KEY: "private-ssh-key"
+```
+
+### 2. Deployment Options
+
+#### Option A: SFTP/SCP Deployment
+
+```yaml
+- name: Deploy to Datacenter
+  uses: appleboy/scp-action@master
+  with:
+    host: ${{ secrets.DC_HOST }}
+    username: ${{ secrets.DC_USERNAME }}
+    key: ${{ secrets.DC_SSH_KEY }}
+    source: "site/*"
+    target: "/path/to/webroot"
+```
+
+#### Option B: Rsync Deployment
+
+```yaml
+- name: Deploy to Datacenter
+  run: |
+    mkdir -p ~/.ssh
+    echo "${{ secrets.DC_SSH_KEY }}" > ~/.ssh/id_rsa
+    chmod 600 ~/.ssh/id_rsa
+    rsync -avz --delete site/ ${{ secrets.DC_USERNAME }}@${{ secrets.DC_HOST }}:/path/to/webroot/
+```
+
+### 3. Complete Workflow Example
+
+```yaml
+name: Deploy Documentation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install mkdocs-material
+
+      - name: Build documentation
+        run: mkdocs build
+
+      # GitHub Pages Deployment
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Datacenter Deployment
+      - name: Deploy to Datacenter
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DC_HOST }}
+          username: ${{ secrets.DC_USERNAME }}
+          key: ${{ secrets.DC_SSH_KEY }}
+          source: "site/*"
+          target: "/path/to/webroot"
+```
+
+## Security Considerations
+
+1. **Access Control**
+   - Use a dedicated deployment user in your datacenter
+   - Restrict SSH key permissions to only what's needed
+   - Consider IP allowlisting if your datacenter supports it
+   - Use environment protection rules in GitHub Actions
+
+2. **Validation & Monitoring**
+
+   ```yaml
+   # Add health check step
+   - name: Verify Datacenter Deployment
+     run: |
+       curl --fail https://your.datacenter.com/docs/ || exit 1
+   ```
+
+## Best Practices
+
+1. **Deployment Protection**
+   - Use environment protection rules to require approval
+   - Add status checks to verify both deployments
+   - Implement smoke tests
+   - Add deployment notifications (e.g., to Slack)
+
+2. **Rollback Strategy**
+   - Keep previous versions of the site
+   - Implement version tagging
+   - Use symlinks for easy rollback:
+
+     ```bash
+     ln -sfn /path/to/webroot/versions/$(date +%Y%m%d_%H%M%S) /path/to/webroot/current
+     ```
+
+## Troubleshooting
+
+1. **Common Issues**
+   - SSH key permissions (should be 600)
+   - Firewall rules blocking deployment
+   - Directory permissions in target location
+   - Network connectivity issues
+
+2. **Verification Steps**
+   - Test SSH connection manually first
+   - Verify target directory permissions
+   - Check deployment logs in GitHub Actions
+   - Validate site accessibility after deployment
+
+## Additional Notes
+
+- The workflow triggers on changes to `docs/` directory and `mkdocs.yml`
+- Manual deployment is possible using workflow_dispatch
+- Both deployments use the same built site content
+- Consider implementing staging environments if needed
+````
+
 ### notes/token-access-enable.png
 
 ```txt
 [Large or binary file detected. File Type: image/png, Size: 334686 bytes]
 ```
-
-### notes/workflows.md
-
-````markdown
-# Workflows Approach
-
-My justification for using the `actions/deploy-pages` action over the `mkdocs gh-deploy` approach [shown here](https://github.com/squidfunk/mkdocs-material/blob/master/docs/publishing-your-site.md)
-
-## Overview
-
-1. **mkdocs gh-deploy approach**:
-
-- Pros:
-  - Simpler workflow (fewer steps)
-  - Built-in to MkDocs
-- Cons:
-  - Requires git credentials setup
-  - Less control over deployment process
-
-- Doesn't use GitHub's native Pages deployment
-
-1. **Our current approach**:
-
-- Pros:
-  - Uses official GitHub Pages actions
-  - Better artifact handling
-  - More explicit control
-  - Integrates with GitHub's deployment system
-  - No git credentials needed
-  - Better security model
-  - Supports Preview Deployments
-
-1. **Conclusion:**
-
-Our current workflow using `actions/deploy-pages` is actually superior because:
-
-- It's more maintainable
-- Better integrated with GitHub
-- More secure
-- More features
-- More transparent
-
-Recommendation: Keep our current workflow - it's the better approach than the official docs suggest.
-
-To expand on the key differences with some added detail:
-
-### 1. Artifact Handling
-
-- **Our Approach**:
-
-  ```yaml
-  - uses: actions/upload-pages-artifact@v3
-  - uses: actions/deploy-pages@v4
-  ```
-
-  - Separate build and deploy steps
-  - Artifacts are properly versioned
-  - Can be downloaded for debugging
-  - Supports retention policies
-
-- **gh-deploy**:
-  - Single command deployment
-  - No artifact preservation
-  - Harder to debug failed deployments
-
-### 2. Security Model
-
-- **Our Approach**:
-
-  ```yaml
-  permissions:
-    contents: read
-    pages: write
-    id-token: write
-  ```
-
-  - Granular permissions
-  - OIDC token authentication
-  - Minimal required access
-
-- **gh-deploy**:
-  - Requires repository write access
-  - Uses less secure PAT tokens
-  - Broader permissions scope
-
-### 3. Preview Deployments
-
-- **Our Approach**:
-
-  ```yaml
-  environment:
-    name: github-pages
-    url: ${{ steps.deployment.outputs.page_url }}
-  ```
-
-  - Supports PR preview deployments
-  - Environment protection rules
-  - Deployment URLs in PR comments
-
-### 4. Integration Features
-
-- **Our Approach**:
-  - Deployment status checks
-  - GitHub deployment API integration
-  - Deployment history
-  - Status badges
-  - Branch protection rules support
-
-### 5. Cache Management
-
-- **Our Approach**:
-
-  ```yaml
-  - name: Generate cache key
-    id: cache-key
-    run: |
-      echo "week=$(date --utc '+%V')" >> $GITHUB_OUTPUT
-      echo "hash=$(sha256sum mkdocs.yml | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
-  ```
-
-  - Content-aware caching
-  - Weekly rotation
-  - Configuration-based invalidation
-
-Our current approach is more robust and enterprise-ready.
-````
 
 > This concludes the repository's file contents. Please review thoroughly for a comprehensive understanding of the codebase.
