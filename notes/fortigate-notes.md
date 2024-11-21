@@ -1,6 +1,7 @@
 # Fortigate Notes
 
-Blair if this is wrong in any way please adjust or let me know. Cheers mate!
+> [!TIP]
+> Blair if this is wrong in any way please adjust or let me know. Cheers mate!
 
 ## GitHub Actions IP Ranges
 
