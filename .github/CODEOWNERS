@@ -6,7 +6,7 @@
 
 *.md @shaneholloman
 /docs/ @shaneholloman
-/notes/ @shaneholloman
+/notes/ @shaneholloman @bhcello
 
 # GitHub specific files
 
