@@ -5,6 +5,9 @@
 
 Blair, obviously you wont need this conf but it would be cool to have this idea of a conf working by someone that knows our Fortigate firewall.
 
+> [!NOTE]
+> We could obscure the port if you wish by changing it to what ever you want. Then I could adjust my workflow accordingly
+
 [Fortigate-Policy](../scripts/fortigate-github-policy.conf)
 
 ## GitHub Actions IP Ranges
