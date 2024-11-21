@@ -3,6 +3,10 @@
 > [!TIP]
 > Blair if this is wrong in any way please adjust or let me know. Cheers mate!
 
+Blair, obviously you wont need this conf but it would be cool to have this idea of a conf working by someone that knows our Fortigate firewall.
+
+[Fortigate-Policy](../scripts/fortigate-github-policy.conf)
+
 ## GitHub Actions IP Ranges
 
 Main curl: `curl https://api.github.com/meta`
