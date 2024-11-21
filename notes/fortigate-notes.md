@@ -1,5 +1,7 @@
 # Fortigate Notes
 
+Blair if this is wrong in any way please adjust or let me know. Cheers mate!
+
 ## GitHub Actions IP Ranges
 
 Main curl: `curl https://api.github.com/meta`
