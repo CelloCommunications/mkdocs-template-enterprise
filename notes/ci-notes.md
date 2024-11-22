@@ -2,7 +2,7 @@
 
 ## Workflow Implementation
 
-To implement an action that pushes the artifact to the specified server, update the `ci.yml` workflow file. This implementation uses `scp` to securely copy files to the server.
+To implement an action that pushes the artifact to the specified server, update the `ci.yml` workflow file. This implementation uses `rsync` to securely copy files to the server.
 
 ### CI Workflow File
 
