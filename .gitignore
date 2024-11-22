@@ -1,3 +1,7 @@
+# Ignore any accidental files from .ssh
+.ssh/
+.ssh/github_actions_deploy*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
