@@ -1,5 +1,7 @@
 # Welcome to MkDocs Test
 
+Docs by: Jose Miau
+
 Repo is here [mkdocs-template-enterprise](https://github.com/CelloCommunications/mkdocs-template-enterprise).
 
 ## Commands
