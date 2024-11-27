@@ -189,9 +189,12 @@ cat ~/.ssh/github_actions_deploy
    - Click "New repository secret"
 
 2. Add required secrets:
-   - `SSH_PRIVATE_KEY`: Content of `~/.ssh/github_actions_deploy` private key
-   - `SERVER_IP`: Your deployment server IP
-   - `DC_USERNAME`: Deployment user (e.g., `docs`)
+   - `SSH_PRIVATE_KEY`: Private key for SSH connection
+   - `SERVER_IP`: IP address of the deployment server
+   - `SERVER_USER`: Username for the deployment server
+   - `SERVER_PORT`: SSH port for the deployment server
+   - `DEPLOY_DIR`: Directory on the datacenter server to deploy files
+   - `GH_TOKEN`: For MkDocs-Insiders, a GitHub token is required
 
 3. Verify secret configuration:
    - Check that `SSH_PRIVATE_KEY` includes BEGIN/END markers
@@ -200,10 +203,8 @@ cat ~/.ssh/github_actions_deploy
 
 ### 4. Connection Testing
 
-Weird inception time ...
-
 ```bash
-# Test SSH connection - yes this feels like the the inception movie!
+# Test SSH connection - yes this feels like the inception!
 ssh -i ~/.ssh/github_actions_deploy -v docs@10.1.25.200
 
 # Test file transfer
@@ -212,6 +213,18 @@ scp -i ~/.ssh/github_actions_deploy test.txt docs@10.1.25.200:/home/docs/site/
 
 # Verify site directory permissions
 ssh -i ~/.ssh/github_actions_deploy docs@10.1.25.200 "ls -la /home/docs/site"
+```
+
+### 5. Spin Up a Dev Server
+
+```sh
+# Spin up a development server on the docs server
+python3 -m http.server --directory /home/docs/site 8000
+```
+
+```sh
+# Spin up a development server on the docs server in the background
+nohup python3 -m http.server 8000 > /dev/null 2>&1 &
 ```
 
 ## Security Best Practices
