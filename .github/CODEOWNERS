@@ -2,13 +2,13 @@
 
 * @shaneholloman
 
-# Documentation and Markdown files
+## Documentation and Markdown files
 
 *.md @shaneholloman
 /docs/ @shaneholloman
 /notes/ @shaneholloman @bhcello
 /scripts/ @shaneholloman @bhcello
 
-# GitHub specific files
+## GitHub specific files
 
 /.github/ @shaneholloman
