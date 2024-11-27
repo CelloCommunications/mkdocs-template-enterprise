@@ -150,7 +150,7 @@ ls -la /home/docs  # Should show docs:docs ownership
 ### 2. Generate SSH Keys
 
 ```sh
-# Generate a dedicated SSH key pair
+# Generate a dedicated SSH key pair as the docs user
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy
 
 # Verify key generation and permissions
@@ -188,8 +188,10 @@ lsb_release -a  # Verify Ubuntu version
 
 ### 4. Connection Testing
 
+Weird inception time ...
+
 ```bash
-# Test SSH connection
+# Test SSH connection - yes this feels like the the inception movie!
 ssh -i ~/.ssh/github_actions_deploy -v docs@10.1.25.200
 
 # Test file transfer
