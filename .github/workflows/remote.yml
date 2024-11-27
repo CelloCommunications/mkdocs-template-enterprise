@@ -87,20 +87,26 @@
 
         - name: Deploy to remote server in our Datacenter
           run: |
+            set -e
+            function handle_error {
+              echo "Error: $1"
+              exit 1
+            }
+
             # Create remote directory if it doesn't exist
             ssh -i ~/.ssh/deploy_key \
                 -p ${{ secrets.SERVER_PORT }} \
                 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-                "mkdir -p ${{ secrets.DEPLOY_DIR }}"
+                "mkdir -p ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to create remote directory"
 
             # Sync files using rsync
             rsync -avz --delete \
                   -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SERVER_PORT }}" \
                   site/ \
-                  ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/
+                  ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/ || handle_error "Failed to sync files"
 
             # Verify deployment
             ssh -i ~/.ssh/deploy_key \
                 -p ${{ secrets.SERVER_PORT }} \
                 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-                "ls -la ${{ secrets.DEPLOY_DIR }}"
+                "ls -la ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to verify deployment"
