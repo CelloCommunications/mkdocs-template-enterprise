@@ -97,10 +97,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H \
-            -p ${{ secrets.SERVER_PORT }} \
-            ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          # ssh-keyscan -H \
+          #   -p ${{ secrets.SERVER_PORT }} \
+          #   ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          # chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy to remote server in our Datacenter
         run: |

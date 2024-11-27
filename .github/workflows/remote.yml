@@ -87,11 +87,11 @@ jobs:
 
       - name: Deploy to remote server in our Datacenter
         run: |
-          set -e
-          function handle_error {
-            echo "Error: $1"
-            exit 1
-          }
+          # set -e
+          # function handle_error {
+          #   echo "Error: $1"
+          #   exit 1
+          # }
 
           # Create remote directory if it doesn't exist
           ssh -i ~/.ssh/deploy_key \
