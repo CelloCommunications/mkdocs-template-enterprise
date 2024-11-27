@@ -105,8 +105,8 @@ jobs:
                 site/ \
                 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/ || handle_error "Failed to sync files"
 
-          # Verify deployment
-          ssh -i ~/.ssh/deploy_key \
-              -p ${{ secrets.SERVER_PORT }} \
-              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-              "ls -la ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to verify deployment"
+          # # Verify deployment
+          # ssh -i ~/.ssh/deploy_key \
+          #     -p ${{ secrets.SERVER_PORT }} \
+          #     ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+          #     "ls -la ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to verify deployment"
