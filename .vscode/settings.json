@@ -1,6 +1,19 @@
 {
   "yaml.schemas": {
-    "https://json.schemastore.org/mkdocs-1.6.json": "file:///c%3A/Users/shane/git/mkdocs-material-example/mkdocs.yml"
+    "https://json.schemastore.org/mkdocs-1.6.json": "/mkdocs.yml",
+    "https://json.schemastore.org/github-workflow.json": "/.github/workflows/*.yml"
+  },
+  "files.associations": {
+    "*.yml": "github-actions-workflow"
+  },
+  "githubActions.workflows.validate": {
+    "enabled": true,
+    "environments": {
+      "allowed": ["github-pages"]
+    }
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "github.vscode-github-actions"
   },
   "cSpell.words": [
     "adipiscing",

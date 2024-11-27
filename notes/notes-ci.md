@@ -4,13 +4,23 @@
 
 To implement an action that pushes the artifact to the specified server, update the `ci.yml` workflow file. This implementation uses `rsync` to securely copy files to the server.
 
+### Secrets Needed for Deployment
+
+- `SSH_PRIVATE_KEY`: Private key for SSH connection
+- `SERVER_IP`: IP address of the deployment server
+- `SERVER_USER`: Username for the deployment server
+- `SERVER_PORT`: SSH port for the deployment server
+- `DEPLOY_DIR`: Directory on the datacenter server to deploy files
+
 ### CI Workflow File
 
 ```yaml
 name: ci
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
@@ -22,7 +32,7 @@ on:
 
 permissions:
   contents: read
-  pages: write
+  pages:    write
   id-token: write
 
 jobs:
@@ -30,7 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url:  ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,9 +49,9 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.x
-          cache: 'pip'
-          cache-dependency-path: '**/requirements.txt'
+          python-version:         3.x
+          cache:                  'pip'
+          cache-dependency-path:  '**/requirements.txt'
 
       - name: Generate cache key
         id: cache-key
@@ -85,22 +96,30 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H -p 65222 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H \
+            -p ${{ secrets.SERVER_PORT }} \
+            ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy to remote server in our Datacenter
         run: |
           # Create remote directory if it doesn't exist
-          ssh -i ~/.ssh/deploy_key -p 65222 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /home/${{ secrets.SERVER_USER }}/site"
+          ssh -i ~/.ssh/deploy_key \
+              -p ${{ secrets.SERVER_PORT }} \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "mkdir -p ${{ secrets.DEPLOY_DIR }}"
 
-          # Sync files using rsync (I'm changing from scp for rsync to use diff updates)
+          # Sync files using rsync
           rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -p 65222" \
-            site/ \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/site/
+                -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SERVER_PORT }}" \
+                site/ \
+                ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/
 
           # Verify deployment
-          ssh -i ~/.ssh/deploy_key -p 65222 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "ls -la /home/${{ secrets.SERVER_USER }}/site"
+          ssh -i ~/.ssh/deploy_key \
+              -p ${{ secrets.SERVER_PORT }} \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "ls -la ${{ secrets.DEPLOY_DIR }}"
 ```
 
 ## SSH Deployment Setup
