@@ -150,6 +150,11 @@ ls -la /home/docs  # Should show docs:docs ownership
 ### 2. Generate SSH Keys
 
 ```sh
+su docs
+cd ~
+```
+
+```sh
 # Generate a dedicated SSH key pair as the docs user
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy
 
@@ -171,6 +176,13 @@ lsb_release -a  # Verify Ubuntu version
 ```
 
 ### 3. GitHub Repository Configuration
+
+From the docs server, add the private key to the GitHub repository secrets.
+
+```sh
+# Display private key for copying from the docs server
+cat ~/.ssh/github_actions_deploy
+```
 
 1. Navigate to repository settings:
    - Go to Settings > Secrets and variables > Actions

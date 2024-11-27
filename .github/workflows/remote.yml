@@ -100,7 +100,7 @@
                 "mkdir -p ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to create remote directory"
 
             # Sync files using rsync
-            rsync -avz --delete \
+            rsync -avz \
                   -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SERVER_PORT }}" \
                   site/ \
                   ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/ || handle_error "Failed to sync files"
