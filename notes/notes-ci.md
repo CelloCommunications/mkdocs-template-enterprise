@@ -11,6 +11,7 @@ To implement an action that pushes the artifact to the specified server, update 
 - `SERVER_USER`: Username for the deployment server
 - `SERVER_PORT`: SSH port for the deployment server
 - `DEPLOY_DIR`: Directory on the datacenter server to deploy files
+- `GH_TOKEN`: For MkDocs-Insiders, a GitHub token is required
 
 ### CI Workflow File
 
@@ -157,9 +158,9 @@ ls -la ~/.ssh/github_actions_deploy*
 # Private key should show: -rw------- (600)
 # Public key should show: -rw-r--r-- (644)
 
-# Install public key
-sudo -u docs tee /home/docs/.ssh/authorized_keys < ~/.ssh/github_actions_deploy.pub
-sudo -u docs chmod 600 /home/docs/.ssh/authorized_keys
+# Install public key as docs user
+tee /home/docs/.ssh/authorized_keys < ~/.ssh/github_actions_deploy.pub
+chmod 600 /home/docs/.ssh/authorized_keys
 
 # Verify setup
 id docs  # Verify user exists
