@@ -1,4 +1,4 @@
-# Welcome to MkDocs Test
+# Welcome to MkDocs Tests
 
 Docs by: Jose Miau
 
