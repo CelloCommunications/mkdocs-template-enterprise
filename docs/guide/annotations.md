@@ -4,8 +4,7 @@ icon: material/alert-outline
 
 # Admonitions
 
-![Gjw4JJ6WgAA9z_U](assets/5ff132e5-2fdf-4641-b5dd-e72c6b84b64a.jpg)
-
+![GjHJohNbIAAVW1-](https://github.com/user-attachments/assets/d2e25af0-5174-4d70-9132-55c32609fea3)
 
 Admonitions, also known as _call-outs_, are an excellent choice for including
 side content without significantly interrupting the document flow. Material for
