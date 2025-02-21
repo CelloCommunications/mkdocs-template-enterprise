@@ -1,4 +1,4 @@
-name: Process GitHub Attachments
+name: docs-attachments
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - '**/*.markdown'
 
 jobs:
-  process-attachments:
+  download-and-relocate:
     runs-on: ubuntu-latest
     permissions:
       contents: write

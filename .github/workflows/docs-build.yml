@@ -1,4 +1,10 @@
-name: ci
+name: docs-build
+
+# Ensure this workflow waits for the attachment processor
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [main]
@@ -10,16 +16,20 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['docs-attachments']
+    types:
+      - completed
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  actions: read    # Added this for private repos
+  actions: read # Added this for private repos
   deployments: write # Added this for private repos
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
