@@ -4,7 +4,7 @@ icon: material/alert-outline
 
 # Admonitions
 
-![Gjw4JJ6WgAA9z_U](https://github.com/user-attachments/assets/5ff132e5-2fdf-4641-b5dd-e72c6b84b64a)
+![Gjw4JJ6WgAA9z_U](assets/5ff132e5-2fdf-4641-b5dd-e72c6b84b64a.jpg)
 
 
 Admonitions, also known as _call-outs_, are an excellent choice for including
