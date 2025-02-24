@@ -1,0 +1,35 @@
+# Project Rules
+
+1. Project Setup Sequence
+   - Step 1: Create virtual environment with `uv venv`
+   - Step 2: Activate virtual environment
+     - Windows: `.venv/Scripts/activate`
+     - Unix: `source .venv/bin/activate`
+   - Step 3: `uv sync` to install all dependencies from pyproject.toml
+
+2. System Tools Check
+   - Before installing any development tools, check if already installed via `uv tool list`
+   - Install system-wide development tools using `uv tool install [tool]`
+   - Common tools like pylint should be installed system-wide, not in virtual environments
+
+3. Documentation Management
+   - This is primarily a mkdocs documentation template project
+   - Use `mkdocs serve` for local development
+   - Use `mkdocs build` for generating static site
+   - Follow Material for MkDocs best practices
+
+4. Package Management
+   - ALWAYS use UV for Python package management
+   - Use `uv pip install [package]` for installing additional packages
+   - Never use regular pip or other package managers
+
+5. Dependencies Management
+   - All dependencies MUST be added to pyproject.toml
+   - Never create requirements.txt or other dependency files
+   - Reference pyproject.toml for all project dependencies
+   - Use the [project.dependencies] section for main dependencies
+   - Use [project.optional-dependencies] for dev/test dependencies
+
+6. Version Management
+   - Use uv.lock for deterministic builds
+   - Do not manually edit uv.lock file

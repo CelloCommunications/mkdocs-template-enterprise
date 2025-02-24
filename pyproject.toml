@@ -5,6 +5,7 @@ description = "Process GitHub user attachments in markdown files"
 requires-python = ">=3.8"
 dependencies = [
   "requests",
+  "mkdocs-material",
 ]
 
 [project.optional-dependencies]
