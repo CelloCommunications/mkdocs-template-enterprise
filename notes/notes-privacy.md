@@ -8,25 +8,25 @@ This document outlines how to configure GitHub Pages for private access, restric
 ### Repository Settings
 
 1. Navigate to your repository settings:
-   - Go to Settings > Pages
-   - Under "Access Control"
-   - Select "Restrict access to members of your organization"
+    - Go to Settings > Pages
+    - Under "Access Control"
+    - Select "Restrict access to members of your organization"
 
 ### Organization Settings
 
 1. Configure organization permissions:
-   - Navigate to Organization Settings
-   - Go to Member privileges
-   - Under "Base permissions", ensure access to private pages is enabled
+    - Navigate to Organization Settings
+    - Go to Member privileges
+    - Under "Base permissions", ensure access to private pages is enabled
 
 ### Deployment Protection
 
 1. Set up environment protection:
-   - Go to Repository Settings > Environments > github-pages
-   - Configure protection rules:
-     - Required reviewers (if needed)
-     - Restrict to specific branches (typically `main`)
-     - Add any deployment branch restrictions
+    - Go to Repository Settings > Environments > github-pages
+    - Configure protection rules:
+      - Required reviewers (if needed)
+      - Restrict to specific branches (typically `main`)
+      - Add any deployment branch restrictions
 
 ## Security Notes
 
