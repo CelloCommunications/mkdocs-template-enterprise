@@ -1,6 +1,6 @@
 # MkDocs Template
 
-[![ci](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/ci.yml)
+[![docs-build](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/docs-build.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/docs-build.yml) [![docs-sync](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/docs-sync.yml/badge.svg)](https://github.com/CelloCommunications/mkdocs-template-enterprise/actions/workflows/docs-sync.yml)
 
 > [!IMPORTANT]
 > Pleased note this repository is a template for creating a new repository.
