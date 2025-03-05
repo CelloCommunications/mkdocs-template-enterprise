@@ -1,0 +1,121 @@
+---
+name: docs-sync
+
+# Ensure this workflow waits for the attachment processor
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "docs/**"
+  #     - "mkdocs.yml"
+  # pull_request:
+  #   paths:
+  #     - "docs/**"
+  #     - "mkdocs.yml"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['docs-attachments']
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  sync-to-datacenter:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
+
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          echo "week=$(date --utc '+%V')" >> $GITHUB_OUTPUT
+          echo "hash=$(sha256sum mkdocs.yml | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ steps.cache-key.outputs.week }}-${{ steps.cache-key.outputs.hash }}
+          path: |
+            ~/.cache/pip
+            ~/.local/lib/python*/site-packages
+          restore-keys: |
+            mkdocs-material-${{ steps.cache-key.outputs.week }}-
+            mkdocs-material-
+
+      - name: Install dependencies
+        run: pip install mkdocs-material
+
+      - name: Build documentation
+        run: mkdocs build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'site'
+          name: github-pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
+
+      - name: Setup SSH on GitHub Actions Ubuntu runner
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H \
+            -p ${{ secrets.SERVER_PORT }} \
+            ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy to remote server in our Datacenter
+        run: |
+          # set -e
+          # function handle_error {
+          #   echo "Error: $1"
+          #   exit 1
+          # }
+
+          # Create remote directory if it doesn't exist
+          ssh -i ~/.ssh/deploy_key \
+              -p ${{ secrets.SERVER_PORT }} \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "mkdir -p ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to create remote directory"
+
+          # Sync files using rsync
+          rsync -avzc --delete --stats \
+                -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SERVER_PORT }}" \
+                site/ \
+                ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}/ || handle_error "Failed to sync files"
+
+          # Verify deployment
+          ssh -i ~/.ssh/deploy_key \
+              -p ${{ secrets.SERVER_PORT }} \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "ls -la ${{ secrets.DEPLOY_DIR }}" || handle_error "Failed to verify deployment"

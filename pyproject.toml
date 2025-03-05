@@ -1,0 +1,26 @@
+[project]
+name = "github-attachments-processor"
+version = "0.1.0"
+description = "Process GitHub user attachments in markdown files"
+requires-python = ">=3.8"
+dependencies = [
+  "requests",
+  "mkdocs-material",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pylint",
+]
+
+[tool.pylint.messages_control]
+disable = [
+  "C0111", # missing-docstring (already have module docstring)
+  "C0103", # invalid-name (for short variable names)
+]
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.basic]
+good-names = ["e", "f", "_"]

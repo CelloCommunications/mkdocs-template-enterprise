@@ -1,0 +1,14 @@
+# Default owner for everything in the repo
+
+* @shaneholloman
+
+## Documentation and Markdown files
+
+*.md @shaneholloman
+/docs/ @shaneholloman
+/notes/ @shaneholloman @bhcello
+/scripts/ @shaneholloman @bhcello
+
+## GitHub specific files
+
+/.github/ @shaneholloman

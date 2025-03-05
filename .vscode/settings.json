@@ -1,0 +1,37 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/mkdocs-1.6.json": "/mkdocs.yml",
+    "https://json.schemastore.org/github-workflow.json": "/.github/workflows/*.yml"
+  },
+  "files.associations": {
+    "*.yml": "github-actions-workflow"
+  },
+  "githubActions.workflows.validate": {
+    "enabled": true,
+    "environments": {
+      "allowed": ["github-pages"]
+    }
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": [
+    "adipiscing",
+    "amet",
+    "auctor",
+    "consectetur",
+    "consequat",
+    "Curabitur",
+    "cursus",
+    "elit",
+    "euismod",
+    "feugiat",
+    "finibus",
+    "justo",
+    "nulla",
+    "Nulla",
+    "Phasellus",
+    "posuere",
+    "tortor"
+  ]
+}

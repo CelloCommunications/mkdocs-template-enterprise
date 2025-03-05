@@ -1,0 +1,42 @@
+name: docs-attachments
+
+on:
+  push:
+    paths:
+      - '**/*.md'
+      - '**/*.mdx'
+      - '**/*.markdown'
+
+jobs:
+  download-and-relocate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Process User Attachments
+        run: |
+          python .github/scripts/process_attachments.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git diff --staged --quiet || git commit -m "chore: download and relocate GitHub user-attachments"
+          git push
