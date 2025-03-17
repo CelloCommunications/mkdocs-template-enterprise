@@ -1,11 +1,16 @@
 # Project Rules
 
 1. Project Setup Sequence
-    - Step 1: Create virtual environment with `uv venv`
-    - Step 2: Activate virtual environment
-      - Windows: `.venv/Scripts/activate`
-      - Unix: `source .venv/bin/activate`
-    - Step 3: `uv sync` to install all dependencies from pyproject.toml
+    - Option A: All-in-one approach (preferred)
+      - Use `uv run` to create environment, install dependencies, and run commands in one step
+      - Example: `uv run mkdocs serve`
+
+    - Option B: Step-by-step approach
+      - Step 1: Create virtual environment with `uv venv`
+      - Step 2: Activate virtual environment
+        - Windows: `.venv/Scripts/activate`
+        - Unix: `source .venv/bin/activate`
+      - Step 3: `uv sync` to install all dependencies from pyproject.toml
 
 2. System Tools Check
     - Before installing any development tools, check if already installed via `uv tool list`
@@ -14,8 +19,8 @@
 
 3. Documentation Management
     - This is primarily a mkdocs documentation template project
-    - Use `mkdocs serve` for local development
-    - Use `mkdocs build` for generating static site
+    - Use `uv run mkdocs serve` for local development (preferred)
+    - Use `uv run mkdocs build` for generating static site
     - Follow Material for MkDocs best practices
 
 4. Package Management
