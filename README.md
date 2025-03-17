@@ -41,3 +41,65 @@ Workflow concepts for managing documentation with GitHub Pages with more advance
 Your Copilot preferences are set via concise plain language instructions here.
 
 [copilot](.github/copilot-instructions.md)
+
+## Prerequisites
+
+### Installing UV
+
+Before running the documentation server, you need to install `uv` - the extremely fast Python package manager. Choose the installation method for your operating system:
+
+#### macOS and Linux
+
+Using the standalone installer:
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Alternatively, with Homebrew:
+
+```sh
+brew install uv
+```
+
+#### Windows
+
+Using the standalone installer:
+
+```sh
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Alternatively, with WinGet:
+
+```sh
+winget install --id=astral-sh.uv -e
+```
+
+#### Other installation methods
+
+You can also install with pipx (works on all platforms):
+
+```sh
+pipx install uv
+```
+
+For more installation options and detailed instructions, see the [official documentation](https://docs.astral.sh/uv/getting-started/installation/).
+
+## Local Development
+
+### Running the documentation server locally
+
+Start the MkDocs development server with a single command:
+
+```sh
+uv run mkdocs serve
+```
+
+This command:
+
+- Creates a Python virtual environment (if it doesn't exist)
+- Installs all dependencies from `pyproject.toml`
+- Starts the MkDocs server in development mode
+
+When the server is running, you can view the documentation at <http://127.0.0.1:8000/>
