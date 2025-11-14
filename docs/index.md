@@ -1,6 +1,6 @@
 # Welcome to MkDocs Tests
 
-Docs by: Jose Miau
+Docs by: Jose Miau and Co.
 
 Repo is here [mkdocs-template-enterprise](https://github.com/CelloCommunications/mkdocs-template-enterprise).
 
